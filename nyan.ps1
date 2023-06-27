@@ -51,10 +51,6 @@ while ($true) {
         $wshell.SendKeys("f")
         Start-Sleep -Seconds 1
 
-        # Check if the video is paused and play it again
-        $wshell.SendKeys(" ")
-        Start-Sleep -Milliseconds 500
-
         # Get the updated Edge window process
         $edgeWindow = Get-Process | Where-Object { $_.MainWindowTitle -like "*YouTube*" }
     }
