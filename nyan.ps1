@@ -37,13 +37,15 @@ while ($true) {
         $null = [User32]::SetForegroundWindow($hwnd)  # Bring the window to the front
     }
 
-    # Send F11 key to enter full screen mode
-    $wshell = New-Object -ComObject WScript.Shell
-    $wshell.SendKeys("{F11}")
-
     # Check if the Edge browser window is closed
     while ($edgeWindow -ne $null -and !$edgeWindow.HasExited) {
-        Start-Sleep -Seconds 5
+        Start-Sleep -Seconds 1
         $edgeWindow = Get-Process | Where-Object { $_.MainWindowTitle -like "*YouTube*" }
     }
+
+    # Send 'F' key to enter full screen mode
+    $wshell = New-Object -ComObject WScript.Shell
+    $wshell.AppActivate("Edge")
+    Start-Sleep -Seconds 1
+    $wshell.SendKeys("F")
 }
