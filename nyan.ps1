@@ -40,18 +40,26 @@ while ($true) {
 
     # Check if the Edge browser window is closed
     while ($edgeWindow -ne $null -and !$edgeWindow.HasExited) {
-        # Check if the YouTube video is paused
+        # Send 'F' key to enter full-screen mode
         $wshell = New-Object -ComObject WScript.Shell
         $wshell.AppActivate("Edge")
         Start-Sleep -Milliseconds 500
-        $wshell.SendKeys(" ")
-        Start-Sleep -Seconds 1
-
-        # Send 'F' key to enter full-screen mode
         $wshell.SendKeys("f")
-        Start-Sleep -Seconds 1
 
-        # Get the updated Edge window process
+        # Check if the Edge window is still in full-screen mode
+        $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
         $edgeWindow = Get-Process | Where-Object { $_.MainWindowTitle -like "*YouTube*" }
-    }
-}
+        $edgeWindow | ForEach-Object {
+            $hwnd = $_.MainWindowHandle
+            $windowRect = [User32]::GetWindowRect($hwnd)
+            $windowWidth = $windowRect.Right - $windowRect.Left
+            $windowHeight = $windowRect.Bottom - $windowRect.Top
+
+            # If the window is not full-screen, set it to full-screen using SetWindowPos
+            if ($windowWidth -ne $screen.Width -or $windowHeight -ne $screen.Height) {
+                $null = [User32]::SetWindowPos($hwnd, 0, $screen.Left, $screen.Top, $screen.Width, $screen.Height, 0x0020)
+            }
+        }
+
+        # Check if the Edge browser window is closed
+        $edgeWindow = Get-Process |
