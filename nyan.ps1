@@ -1,4 +1,4 @@
-$youtubeURL = "https://www.youtube.com/v/mEJ_jxFJU_0"
+$youtubeVideoId = "mEJ_jxFJU_0"
 $nircmdPath = ".\nircmd.exe"
 
 # Check if NirCmd is present in the current directory
@@ -16,7 +16,7 @@ if (-not (Test-Path $nircmdPath)) {
     [System.IO.Compression.ZipFile]::ExtractToDirectory($nircmdZipPath, ".")
 
     # Remove the zip file
-    Remove-Item -Path $nircmdZipPath
+    # Remove-Item -Path $nircmdZipPath
 }
 
 # Maximize system volume
@@ -24,10 +24,11 @@ Start-Process -FilePath $nircmdPath -ArgumentList "setsysvolume 65535"
 
 while ($true) {
     # Launch Edge browser and navigate to YouTube URL
+    $youtubeURL = "https://www.youtube.com/watch?v=$youtubeVideoId"
     $edgeProcess = Start-Process -FilePath "msedge" -ArgumentList $youtubeURL -PassThru
 
     # Wait for the browser to open and load the page
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds 3
 
     # Find the Edge browser window and maximize it
     $edgeWindow = Get-Process | Where-Object { $_.MainWindowTitle -like "*YouTube*" }
@@ -39,13 +40,22 @@ while ($true) {
 
     # Check if the Edge browser window is closed
     while ($edgeWindow -ne $null -and !$edgeWindow.HasExited) {
+        # Check if the YouTube video is paused
+        $wshell = New-Object -ComObject WScript.Shell
+        $wshell.AppActivate("Edge")
+        Start-Sleep -Milliseconds 500
+        $wshell.SendKeys(" ")
         Start-Sleep -Seconds 1
+
+        # Send 'F' key to enter full-screen mode
+        $wshell.SendKeys("f")
+        Start-Sleep -Seconds 1
+
+        # Check if the video is paused and play it again
+        $wshell.SendKeys(" ")
+        Start-Sleep -Milliseconds 500
+
+        # Get the updated Edge window process
         $edgeWindow = Get-Process | Where-Object { $_.MainWindowTitle -like "*YouTube*" }
     }
-
-    # Send 'F' key to enter full screen mode
-    $wshell = New-Object -ComObject WScript.Shell
-    $wshell.AppActivate("Edge")
-    Start-Sleep -Seconds 1
-    $wshell.SendKeys("F")
 }
