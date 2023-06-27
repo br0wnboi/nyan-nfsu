@@ -1,4 +1,4 @@
-$youtubeURL = "https://www.youtube.com/watch?v=mEJ_jxFJU_0"
+$youtubeURL = "https://www.youtube.com/v/mEJ_jxFJU_0"
 $nircmdPath = ".\nircmd.exe"
 
 # Check if NirCmd is present in the current directory
